@@ -1,0 +1,31 @@
+# NutriSmart – Adatbázis terv-vázlat
+
+## users (felhasználók)
+- id (PK)
+- email
+- password_hash
+- height
+- weight
+- goal
+- activity_level
+- allergies
+
+## foods (ételek)
+- id (PK)
+- name
+- calories
+- protein
+- carbohydrates
+- fat
+- allergens
+
+## meal_plans (étrendek)
+- id (PK)
+- user_id (FK -> users.id)
+- date
+
+## meal_plan_items (étrend elemei)
+- id (PK)
+- meal_plan_id (FK -> meal_plans.id)
+- food_id (FK -> foods.id)
+- quantity
