@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "NutriSmart API",
+    "_postman_id": "0a08f9d6-41ff-4d57-a18e-0c6b3ab0ef35",
+    "description": "Postman collection a NutriSmart backend végpontjaihoz, admin felhasználókezeléssel és meal plan tesztekkel.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api", "health"] }
+      }
+    },
+    {
+      "name": "Auth / Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"postman-user@nutrismart.hu\",\n  \"password\": \"StrongPass1\",\n  \"confirmPassword\": \"StrongPass1\",\n  \"fullName\": \"Postman User\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Register sikeres', function () { pm.response.to.have.status(201); });",
+            "const json = pm.response.json();",
+            "pm.collectionVariables.set('userToken', json.token);",
+            "pm.collectionVariables.set('userId', json.user.id);"
+          ],
+          "type": "text/javascript"
+        }
+      }]
+    },
+    {
+      "name": "Auth / Login Admin",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@nutrismart.hu\",\n  \"password\": \"admin12345\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Admin login sikeres', function () { pm.response.to.have.status(200); });",
+            "const json = pm.response.json();",
+            "pm.collectionVariables.set('adminToken', json.token);",
+            "pm.collectionVariables.set('adminId', json.user.id);"
+          ],
+          "type": "text/javascript"
+        }
+      }]
+    },
+    {
+      "name": "Users / Me",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api", "users", "me"] }
+      }
+    },
+    {
+      "name": "Users / Profile",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+      }
+    },
+    {
+      "name": "Meal Plan / Generate",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+        "url": { "raw": "{{baseUrl}}/api/meal-plans/users/{{userId}}/generate", "host": ["{{baseUrl}}"], "path": ["api", "meal-plans", "users", "{{userId}}", "generate"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Meal plan generálás sikeres', function () { pm.response.to.have.status(200); });",
+            "const json = pm.response.json();",
+            "pm.test('Pontosan 3 étkezés van', function () { pm.expect(json.meals.length).to.eql(3); });",
+            "pm.test('A teljes kalória megegyezik a céllal', function () { pm.expect(json.totalCalories).to.eql(json.targetCalories); });"
+          ],
+          "type": "text/javascript"
+        }
+      }]
+    },
+    {
+      "name": "Admin / List Users",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": { "raw": "{{baseUrl}}/api/admin/users", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Felhasználólista lekérhető', function () { pm.response.to.have.status(200); });",
+            "const json = pm.response.json();",
+            "pm.test('Van felhasználónév a válaszban', function () { pm.expect(json[0].fullName).to.be.a('string'); });"
+          ],
+          "type": "text/javascript"
+        }
+      }]
+    },
+    {
+      "name": "Admin / Disable User",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"role\": \"USER\",\n  \"active\": false\n}" },
+        "url": { "raw": "{{baseUrl}}/api/admin/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users", "{{userId}}"] }
+      }
+    },
+    {
+      "name": "Admin / Delete User",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": { "raw": "{{baseUrl}}/api/admin/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "admin", "users", "{{userId}}"] }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Felhasználó törlése sikeres', function () { pm.response.to.have.status(204); });"
+          ],
+          "type": "text/javascript"
+        }
+      }]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "userToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "adminId", "value": "" }
+  ]
+}

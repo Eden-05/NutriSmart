@@ -1,0 +1,52 @@
+{
+  "info": {
+    "name": "NutriSmart admin + foods + mealplan",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login admin",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "url": {"raw":"{{baseUrl}}/api/auth/login","host":["{{baseUrl}}"],"path":["api","auth","login"]},
+        "body": {"mode":"raw","raw":"{\n  \"email\": \"admin@nutrismart.hu\",\n  \"password\": \"admin12345\"\n}"}
+      }
+    },
+    {
+      "name": "List foods",
+      "request": {
+        "method": "GET",
+        "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+        "url": {"raw":"{{baseUrl}}/api/admin/foods","host":["{{baseUrl}}"],"path":["api","admin","foods"]}
+      }
+    },
+    {
+      "name": "Create food",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{token}}"}],
+        "url": {"raw":"{{baseUrl}}/api/admin/foods","host":["{{baseUrl}}"],"path":["api","admin","foods"]},
+        "body": {"mode":"raw","raw":"{\n  \"name\": \"Sült karfiol\",\n  \"category\": \"zöldség\",\n  \"recommendedMeal\": \"ebéd\",\n  \"macroRole\": \"carb\",\n  \"imageUrl\": \"\",\n  \"caloriesPer100g\": 60,\n  \"proteinPer100g\": 2.5,\n  \"carbsPer100g\": 8.0,\n  \"fatPer100g\": 2.0,\n  \"vegetarian\": true,\n  \"active\": true\n}"}
+      }
+    },
+    {
+      "name": "Update profile vegetarian",
+      "request": {
+        "method": "PUT",
+        "header": [{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{token}}"}],
+        "url": {"raw":"{{baseUrl}}/api/users/2","host":["{{baseUrl}}"],"path":["api","users","2"]},
+        "body": {"mode":"raw","raw":"{\n  \"id\": 2,\n  \"email\": \"user@nutrismart.hu\",\n  \"fullName\": \"Demo User\",\n  \"gender\": \"no\",\n  \"age\": 29,\n  \"heightCm\": 175,\n  \"weightKg\": 74,\n  \"goal\": \"fogyas\",\n  \"activityLevel\": \"kozepes\",\n  \"vegetarianEnabled\": true\n}"}
+      }
+    },
+    {
+      "name": "Generate meal plan",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+        "url": {"raw":"{{baseUrl}}/api/meal-plans/users/2/generate","host":["{{baseUrl}}"],"path":["api","meal-plans","users","2","generate"]}
+      }
+    }
+  ],
+  "variable": [{"key":"baseUrl","value":"http://localhost:8080"},{"key":"token","value":""}]
+}
